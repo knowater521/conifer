@@ -8,6 +8,7 @@ import config from 'config';
 
 import { setSort } from 'store/modules/collection';
 import { getCollectionLink, getListLink, range, truncate } from 'helpers/utils';
+import { AppContext } from 'store/contexts';
 
 import {
   Automation,
@@ -31,11 +32,7 @@ import './style.scss';
 
 
 class CollectionDetailUI extends Component {
-  static contextTypes = {
-    canAdmin: PropTypes.bool,
-    isAnon: PropTypes.bool,
-    isMobile: PropTypes.bool
-  };
+  static contextType = AppContext;
 
   static propTypes = {
     auth: PropTypes.object,
@@ -277,10 +274,11 @@ class CollectionDetailUI extends Component {
   }
 
   render() {
-    const { canAdmin, isAnon } = this.context;
-    const { pages, browsers, collection, list, match: { params }, publicIndex, removeBookmark } = this.props;
+    const { isAnon } = this.context;
+    const { auth, pages, browsers, collection, list, match: { params }, publicIndex, removeBookmark } = this.props;
     const { listBookmarks, selectedPageIdx, sortedBookmarks } = this.state;
     const activeList = Boolean(params.list);
+    const canAdmin = auth.getIn(['user', 'username']) === params.user;
 
     const collRedirect = collection.get('loaded') && !collection.get('slug_matched') && params.coll !== collection.get('slug');
 

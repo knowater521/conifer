@@ -13,16 +13,13 @@ import { getArchives, setExtractable, updateUrlAndTimestamp } from 'store/module
 import { resetStats } from 'store/modules/infoStats';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
 import { getActiveCollection } from 'store/selectors';
+import { ControllerContext } from 'store/contexts';
 
 import { Autopilot, RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
 
 
 class Extract extends Component {
-  static contextTypes = {
-    product: PropTypes.string
-  };
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     activeCollection: PropTypes.object,
@@ -37,26 +34,10 @@ class Extract extends Component {
     url: PropTypes.string
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    currMode: PropTypes.string,
-    canAdmin: PropTypes.bool,
-    product: PropTypes.string
-  };
-
   constructor(props) {
     super(props);
 
     this.mode = props.match.params.extractMode;
-  }
-
-  getChildContext() {
-    const { auth, match: { params: { extractMode, user } } } = this.props;
-
-    return {
-      currMode: extractMode,
-      canAdmin: auth.getIn(['user', 'username']) === user
-    };
   }
 
   componentWillUnmount() {
@@ -65,8 +46,26 @@ class Extract extends Component {
   }
 
   render() {
-    const { activeBrowser, activeCollection, autopilotRunning, dispatch, extractable, match: { params }, timestamp, url } = this.props;
+    const {
+      activeBrowser,
+      activeCollection,
+      auth,
+      autopilotRunning,
+      dispatch,
+      extractable,
+      match: { params },
+      timestamp,
+      url
+    } = this.props;
     const { user, coll, rec } = params;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === user,
+      currMode: this.mode,
+      coll,
+      user,
+      rec
+    };
 
     const archId = extractable.get('id');
     const extractFrag = `${extractable.get('allSources') ? 'extract' : 'extract_only'}:${archId}`;
@@ -74,7 +73,7 @@ class Extract extends Component {
     const contentPrefix = `${config.contentHost}/${user}/${coll}/${rec}/${extractFrag}/`;
 
     return (
-      <React.Fragment>
+      <ControllerContext.Provider value={contextValues}>
         <ReplayUI
           activeBrowser={activeBrowser}
           activeCollection={activeCollection}
@@ -104,7 +103,7 @@ class Extract extends Component {
           }
           <Autopilot />
         </div>
-      </React.Fragment>
+      </ControllerContext.Provider>
     );
   }
 }

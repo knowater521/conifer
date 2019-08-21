@@ -10,6 +10,7 @@ import { isLoaded, load as loadColl } from 'store/modules/collection';
 import { getArchives, updateUrlAndTimestamp } from 'store/modules/controls';
 import { resetStats } from 'store/modules/infoStats';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
+import { ControllerContext } from 'store/contexts';
 
 import { Autopilot, RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -24,10 +25,6 @@ if (__DESKTOP__) {
 
 
 class Patch extends Component {
-  static contextTypes = {
-    product: PropTypes.string
-  }
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     appSettings: PropTypes.object,
@@ -41,31 +38,10 @@ class Patch extends Component {
     url: PropTypes.string
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    currMode: PropTypes.string,
-    canAdmin: PropTypes.bool,
-    coll: PropTypes.string,
-    rec: PropTypes.string,
-    user: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
 
     this.mode = 'patch';
-  }
-
-  getChildContext() {
-    const { auth, match: { params: { user, coll, rec } } } = this.props;
-
-    return {
-      currMode: 'patch',
-      canAdmin: auth.getIn(['user', 'username']) === user,
-      user,
-      coll,
-      rec
-    };
   }
 
   componentWillUnmount() {
@@ -74,14 +50,22 @@ class Patch extends Component {
   }
 
   render() {
-    const { activeBrowser, appSettings, autopilotRunning, dispatch, match: { params }, timestamp, url } = this.props;
+    const { activeBrowser, appSettings, auth, autopilotRunning, dispatch, match: { params }, timestamp, url } = this.props;
     const { user, coll, rec } = params;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === params.user,
+      currMode: this.mode,
+      coll: params.coll,
+      user: params.user,
+      rec: params.rec,
+    };
 
     const appPrefix = `${config.appHost}/${user}/${coll}/${rec}/patch/`;
     const contentPrefix = `${config.contentHost}/${user}/${coll}/${rec}/patch/`;
 
     return (
-      <React.Fragment>
+      <ControllerContext.Provider value={contextValues}>
         <Helmet>
           <title>Patching</title>
         </Helmet>
@@ -131,8 +115,7 @@ class Patch extends Component {
 
           <Autopilot />
         </div>
-
-      </React.Fragment>
+      </ControllerContext.Provider>
     );
   }
 }

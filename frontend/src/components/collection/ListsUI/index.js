@@ -20,7 +20,6 @@ import './style.scss';
 class ListsUI extends Component {
 
   static contextTypes = {
-    asPublic: PropTypes.bool,
     canAdmin: PropTypes.bool
   };
 
@@ -53,12 +52,11 @@ class ListsUI extends Component {
     sortLists: PropTypes.func
   };
 
-  constructor(props, { asPublic }) {
+  constructor(props) {
     super(props);
 
     this.createHandle = null;
     this.editHandle = null;
-    const lists = asPublic ? props.lists.filter(l => l.get('public')) : props.lists;
     this.state = {
       editModal: false,
       title: '',
@@ -66,7 +64,7 @@ class ListsUI extends Component {
       created: false,
       isEditing: false,
       edited: false,
-      lists
+      lists: props.lists
     };
   }
 

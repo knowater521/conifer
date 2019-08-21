@@ -10,6 +10,7 @@ import { clear, multiSelect, selectBookmark, selectPage } from 'store/modules/in
 import { load as loadList, removeBookmark, bookmarkSort } from 'store/modules/list';
 import { setQueryMode } from 'store/modules/pageQuery';
 import { isLoaded as isRBLoaded, load as loadRB } from 'store/modules/remoteBrowsers';
+import { AccessContext } from 'store/contexts';
 
 import { getQueryPages, getOrderedPages } from 'store/selectors';
 import { pageSearchResults } from 'store/selectors/search';
@@ -24,27 +25,17 @@ class CollectionDetail extends Component {
     match: PropTypes.object
   };
 
-  // TODO: update to new context api
-  static childContextTypes = {
-    asPublic: PropTypes.bool,
-    canAdmin: PropTypes.bool
-  };
-
-  getChildContext() {
-    const { auth, location: { search }, match: { params: { user } } } = this.props;
-    const username = auth.getIn(['user', 'username']);
-
-    const asPublic = search ? search.indexOf('asPublic') !== -1 : false;
-
-    return {
-      canAdmin: username === user && !asPublic,
-      asPublic
-    };
-  }
-
   render() {
+    const { auth, match: { params: { user } } } = this.props;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === user
+    };
+
     return (
-      <CollectionDetailUI {...this.props} />
+      <AccessContext.Provider value={contextValues}>
+        <CollectionDetailUI {...this.props} />
+      </AccessContext.Provider>
     );
   }
 }

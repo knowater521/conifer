@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import { remoteBrowserMod } from 'helpers/utils';
+import { ControllerContext } from 'store/contexts';
 
 import { InfoWidget, RemoteBrowserSelect } from 'containers';
 
@@ -12,10 +13,7 @@ import './style.scss';
 
 
 class ReplayURLBar extends Component {
-  static contextTypes = {
-    canAdmin: PropTypes.bool,
-    currMode: PropTypes.string
-  }
+  static contextType = ControllerContext;
 
   static propTypes = {
     activeBrowser: PropTypes.string,

@@ -14,7 +14,6 @@ import CollectionCoverUI from 'components/collection/CollectionCoverUI';
 
 class CollectionCover extends Component {
   static childContextTypes = {
-    asPublic: PropTypes.bool,
     canAdmin: PropTypes.bool
   };
 
@@ -28,11 +27,8 @@ class CollectionCover extends Component {
     const { auth, location: { search }, match: { params: { user } } } = this.props;
     const username = auth.getIn(['user', 'username']);
 
-    const asPublic = search ? search.indexOf('asPublic') !== -1 : false;
-
     return {
-      canAdmin: username === user && !asPublic,
-      asPublic
+      canAdmin: username === user
     };
   }
 

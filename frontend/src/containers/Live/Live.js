@@ -6,8 +6,8 @@ import { asyncConnect } from 'redux-connect';
 import config from 'config';
 
 import { isLoaded, load as loadColl } from 'store/modules/collection';
-import { getArchives, updateUrl } from 'store/modules/controls';
-import { load as loadUser } from 'store/modules/user';
+import { updateUrl } from 'store/modules/controls';
+import { ControllerContext } from 'store/contexts';
 
 import { RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -23,10 +23,6 @@ if (__DESKTOP__) {
 
 
 class Live extends Component {
-  static contextTypes = {
-    product: PropTypes.string
-  };
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     appSettings: PropTypes.object,
@@ -38,31 +34,10 @@ class Live extends Component {
     url: PropTypes.string
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    currMode: PropTypes.string,
-    canAdmin: PropTypes.bool,
-    coll: PropTypes.string,
-    rec: PropTypes.string,
-    user: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
 
     this.mode = 'live';
-  }
-
-  getChildContext() {
-    const { auth, match: { params: { user, coll, rec } } } = this.props;
-
-    return {
-      currMode: 'live',
-      canAdmin: auth.getIn(['user', 'username']) === user,
-      user,
-      coll,
-      rec
-    };
   }
 
   // shouldComponentUpdate(nextProps) {
@@ -75,14 +50,22 @@ class Live extends Component {
   // }
 
   render() {
-    const { activeBrowser, appSettings, dispatch, match: { params }, timestamp, url } = this.props;
+    const { activeBrowser, appSettings, auth, dispatch, match: { params }, timestamp, url } = this.props;
     const { user, coll, rec } = params;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === params.user,
+      currMode: this.mode,
+      coll,
+      user,
+      rec
+    };
 
     const appPrefix = `${config.appHost}/${user}/live/`;
     const contentPrefix = `${config.contentHost}/${user}/live/`;
 
     return (
-      <React.Fragment>
+      <ControllerContext.Provider value={contextValues}>
         <Helmet>
           <title>Previewing</title>
         </Helmet>
@@ -127,7 +110,7 @@ class Live extends Component {
             )
           }
         </div>
-      </React.Fragment>
+      </ControllerContext.Provider>
     );
   }
 }

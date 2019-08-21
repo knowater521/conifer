@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import config from 'config';
 
 import { apiFetch, remoteBrowserMod } from 'helpers/utils';
+import { ControllerContext } from 'store/contexts';
 
 import OutsideClick from 'components/OutsideClick';
 import { PatchIcon, SnapshotIcon } from 'components/icons';
@@ -13,9 +14,7 @@ import { Blinker, SizeCounter } from 'containers';
 import './style.scss';
 
 class ModeSelectorUI extends PureComponent {
-  static contextTypes = {
-    currMode: PropTypes.string,
-  };
+  static contextType = ControllerContext;
 
   static propTypes = {
     activeBrowser: PropTypes.string,

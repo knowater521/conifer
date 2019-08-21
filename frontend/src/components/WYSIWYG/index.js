@@ -6,7 +6,9 @@ import ButtonGroup from 'react-rte/lib/ui/ButtonGroup';
 import IconButton from 'react-rte/lib/ui/IconButton';
 import remark from 'remark';
 import remark2react from 'remark-react';
-import { Button } from 'react-bootstrap'
+import { Button } from 'react-bootstrap';
+
+import { AccessContext } from 'store/contexts';
 
 import { PencilIcon, XIcon } from 'components/icons';
 
@@ -14,9 +16,7 @@ import './style.scss';
 
 
 class WYSIWYG extends Component {
-  static contextTypes = {
-    canAdmin: PropTypes.bool
-  };
+  static contextType = AccessContext;
 
   static propTypes = {
     active: PropTypes.bool,

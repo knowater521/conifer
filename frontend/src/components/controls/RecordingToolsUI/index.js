@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 
 import { appHost, product } from 'config';
 import { apiFetch } from 'helpers/utils';
+import { ControllerContext } from 'store/contexts';
 
 import { ShareWidget } from 'containers';
 
@@ -15,6 +16,8 @@ import './style.scss';
 
 
 class RecordingToolsUI extends PureComponent {
+  static contextType = ControllerContext;
+
   static propTypes = {
     activeBrowser: PropTypes.string,
     auth: PropTypes.object,
@@ -26,11 +29,6 @@ class RecordingToolsUI extends PureComponent {
     toggleClipboard: PropTypes.func,
     toggleAutopilotSidebar: PropTypes.func,
     url: PropTypes.string
-  };
-
-  static contextTypes = {
-    canAdmin: PropTypes.bool,
-    currMode: PropTypes.string
   };
 
   constructor(props) {

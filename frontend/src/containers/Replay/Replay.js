@@ -16,6 +16,7 @@ import { resetStats } from 'store/modules/infoStats';
 import { listLoaded, load as loadList } from 'store/modules/list';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
 import { toggle as toggleSidebar } from 'store/modules/sidebar';
+import { AppContext, ControllerContext } from 'store/contexts';
 
 import EmbedFooter from 'components/EmbedFooter';
 import HttpStatus from 'components/HttpStatus';
@@ -32,10 +33,7 @@ if (__DESKTOP__) {
 
 
 class Replay extends Component {
-  static contextTypes = {
-    isEmbed: PropTypes.bool,
-    isMobile: PropTypes.bool
-  };
+  static contextType = AppContext;
 
   static propTypes = {
     activeBookmarkId: PropTypes.string,
@@ -56,33 +54,12 @@ class Replay extends Component {
     url: PropTypes.string
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    currMode: PropTypes.string,
-    canAdmin: PropTypes.bool,
-    coll: PropTypes.string,
-    rec: PropTypes.string,
-    user: PropTypes.string
-  };
-
   constructor(props) {
     super(props);
 
     // TODO: unify replay and replay-coll
     this.mode = 'replay-coll';
     this.state = { collectionNav: !props.match.params.listSlug };
-  }
-
-  getChildContext() {
-    const { auth, match: { params: { user, coll, rec } } } = this.props;
-
-    return {
-      currMode: this.mode,
-      canAdmin: auth.getIn(['user', 'username']) === user,
-      user,
-      coll,
-      rec,
-    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -139,6 +116,15 @@ class Replay extends Component {
       timestamp,
       url
     } = this.props;
+    const { coll, rec, user } = params;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === user,
+      currMode: this.mode,
+      coll,
+      user,
+      rec
+    };
 
     // coll access
     if (collection.get('error')) {
@@ -147,7 +133,7 @@ class Replay extends Component {
           {collection.getIn(['error', 'error_message'])}
         </HttpStatus>
       );
-    } else if (collection.get('loaded') && !collection.get('slug_matched') && params.coll !== collection.get('slug')) {
+    } else if (collection.get('loaded') && !collection.get('slug_matched') && coll !== collection.get('slug')) {
       return (
         <RedirectWithStatus
           to={`${isEmbed ? `/${params.embed}` : ''}${getCollectionLink(collection)}/${remoteBrowserMod(activeBrowser, timestamp)}/${url}`}
@@ -174,14 +160,14 @@ class Replay extends Component {
       );
     }
 
-    const canAdmin = auth.getIn(['user', 'username']) === params.user;
+    const canAdmin = auth.getIn(['user', 'username']) === user;
     const tsMod = remoteBrowserMod(activeBrowser, timestamp);
     const { listSlug } = params;
     const bkId = params.bookmarkId;
 
     const shareUrl = listSlug ?
-      `${config.appHost}${params.user}/${params.coll}/list/${listSlug}/b${bkId}/${tsMod}/${url}` :
-      `${config.appHost}${params.user}/${params.coll}/${tsMod}/${url}`;
+      `${config.appHost}${user}/${coll}/list/${listSlug}/b${bkId}/${tsMod}/${url}` :
+      `${config.appHost}${user}/${coll}/${tsMod}/${url}`;
 
     if (!collection.get('loaded')) {
       return null;
@@ -193,7 +179,7 @@ class Replay extends Component {
       <meta property="og:description" content={collection.get('desc') ? truncate(collection.get('desc'), 3, new RegExp(/([.!?])/)) : config.tagline} />;
 
     return (
-      <React.Fragment>
+      <ControllerContext.Provider value={contextValues}>
         <Helmet>
           <title>{title}</title>
           <meta property="og:url" content={shareUrl} />
@@ -253,7 +239,7 @@ class Replay extends Component {
                 timestamp={timestamp}
                 canGoBackward={appSettings.get('canGoBackward')}
                 canGoForward={appSettings.get('canGoForward')}
-                partition={`persist:${params.user}-replay`}
+                partition={`persist:${user}-replay`}
                 url={url} />
           }
           {
@@ -284,7 +270,7 @@ class Replay extends Component {
             )
           }
         </div>
-      </React.Fragment>
+      </ControllerContext.Provider>
     );
   }
 }

@@ -6,6 +6,7 @@ import { withRouter } from 'react-router';
 
 import { apiFetch, stripProtocol, setTitle } from 'helpers/utils';
 import { autopilotCheck, autopilotReset, autopilotReady, toggleAutopilot, updateBehaviorState, updateBehaviorMessage } from 'store/modules/automation';
+import { ControllerContext } from 'store/contexts';
 
 import { setBrowserHistory } from 'store/modules/appSettings';
 import { setMethod, updateTimestamp, updateUrl } from 'store/modules/controls';
@@ -18,6 +19,8 @@ const { ipcRenderer } = window.require('electron');
 
 
 class Webview extends Component {
+  static contextType = ControllerContext;
+
   static propTypes = {
     behavior: PropTypes.string,
     canGoBackward: PropTypes.bool,
@@ -31,13 +34,6 @@ class Webview extends Component {
     url: PropTypes.string,
   };
 
-  static contextTypes = {
-    coll: PropTypes.string,
-    currMode: PropTypes.string,
-    rec: PropTypes.string,
-    user: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
 
@@ -49,7 +45,7 @@ class Webview extends Component {
   }
 
   componentDidMount() {
-    const { currMode, user } = this.context;
+    const { currMode } = this.context;
     const { dispatch, host, params } = this.props;
 
     const realHost = host || appHost;

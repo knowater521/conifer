@@ -4,6 +4,7 @@ import { fromJS } from 'immutable';
 import { DropdownButton } from 'react-bootstrap';
 
 import { remoteBrowserMod } from 'helpers/utils';
+import { ControllerContext } from 'store/contexts';
 
 import { RemoteBrowserOption } from 'components/controls';
 
@@ -12,9 +13,7 @@ import 'shared/scss/dropdown.scss';
 import { filterBrowsers } from 'config';
 
 class RemoteBrowserSelectUI extends PureComponent {
-  static contextTypes = {
-    currMode: PropTypes.string
-  };
+  static contextType = ControllerContext;
 
   static propTypes = {
     accessed: PropTypes.number,

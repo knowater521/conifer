@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import config from 'config';
 import WebSocketHandler from 'helpers/ws';
+import { ControllerContext } from 'store/contexts';
 
 import { autopilotReady, toggleAutopilot, updateBehaviorState, updateBehaviorMessage } from 'store/modules/automation';
 import { setMethod, updateTimestamp, updateUrl } from 'store/modules/controls';
@@ -14,6 +15,8 @@ import './style.scss';
 
 
 class IFrame extends Component {
+  static contextType = ControllerContext;
+
   static propTypes = {
     activeBookmarkId: PropTypes.string,
     auth: PropTypes.object,
@@ -26,10 +29,6 @@ class IFrame extends Component {
     timestamp: PropTypes.string,
     url: PropTypes.string
   };
-
-  static contextTypes = {
-    currMode: PropTypes.string
-  }
 
   constructor(props) {
     super(props);

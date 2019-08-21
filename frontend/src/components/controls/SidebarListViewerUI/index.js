@@ -5,29 +5,23 @@ import ArrowKeyStepper from 'react-virtualized/dist/commonjs/ArrowKeyStepper';
 import Column from 'react-virtualized/dist/commonjs/Table/Column';
 import Table from 'react-virtualized/dist/commonjs/Table';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
 import { batchActions } from 'redux-batched-actions';
 
-import { defaultListDesc, untitledEntry } from 'config';
-import { getListLink, remoteBrowserMod } from 'helpers/utils';
+import { untitledEntry } from 'config';
 
 import { setBookmarkId, updateUrlAndTimestamp } from 'store/modules/controls';
 import { setBrowser } from 'store/modules/remoteBrowsers';
+import { ControllerContext } from 'store/contexts';
 
 import InlineEditor from 'components/InlineEditor';
-import SidebarHeader from 'components/SidebarHeader';
-import Truncate from 'components/Truncate';
-import WYSIWYG from 'components/WYSIWYG';
-import { CatalogIcon, ListIcon } from 'components/icons';
+import { ListIcon } from 'components/icons';
 
 import { BookmarkRenderer, PageIndex } from './renderers';
 import './style.scss';
 
 
 class SidebarListViewer extends Component {
-  static contextTypes = {
-    canAdmin: PropTypes.bool
-  }
+  static contextType = ControllerContext;
 
   static propTypes = {
     activeBookmark: PropTypes.number,

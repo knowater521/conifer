@@ -11,6 +11,7 @@ import { getArchives, updateUrl } from 'store/modules/controls';
 import { resetStats } from 'store/modules/infoStats';
 import { loadRecording } from 'store/modules/recordings';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
+import { ControllerContext } from 'store/contexts';
 
 import { Autopilot, RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -26,10 +27,6 @@ if (__DESKTOP__) {
 
 
 class Record extends Component {
-  static contextTypes = {
-    product: PropTypes.string
-  };
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     appSettings: PropTypes.object,
@@ -43,31 +40,10 @@ class Record extends Component {
     url: PropTypes.string
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    currMode: PropTypes.string,
-    canAdmin: PropTypes.bool,
-    coll: PropTypes.string,
-    rec: PropTypes.string,
-    user: PropTypes.string,
-  };
-
   constructor(props) {
     super(props);
 
     this.mode = 'record';
-  }
-
-  getChildContext() {
-    const { auth, match: { params: { user, coll, rec } } } = this.props;
-
-    return {
-      currMode: 'record',
-      canAdmin: auth.getIn(['user', 'username']) === user,
-      user,
-      coll,
-      rec
-    };
   }
 
   componentWillUnmount() {
@@ -85,14 +61,22 @@ class Record extends Component {
   // }
 
   render() {
-    const { activeBrowser, appSettings, autopilotRunning, dispatch, match: { params }, timestamp, url } = this.props;
+    const { activeBrowser, auth, appSettings, autopilotRunning, dispatch, match: { params }, timestamp, url } = this.props;
     const { user, coll, rec } = params;
+
+    const contextValues = {
+      canAdmin: auth.getIn(['user', 'username']) === params.user,
+      currMode: this.mode,
+      coll,
+      user,
+      rec
+    };
 
     const appPrefix = `${config.appHost}/${user}/${coll}/${rec}/record/`;
     const contentPrefix = `${config.contentHost}/${user}/${coll}/${rec}/record/`;
 
     return (
-      <React.Fragment>
+      <ControllerContext.Provider value={contextValues}>
         <Helmet>
           <title>Capturing</title>
         </Helmet>
@@ -142,7 +126,7 @@ class Record extends Component {
 
           <Autopilot />
         </div>
-      </React.Fragment>
+      </ControllerContext.Provider>
     );
   }
 }

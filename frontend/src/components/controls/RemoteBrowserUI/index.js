@@ -4,6 +4,7 @@ import { Alert } from 'react-bootstrap';
 
 import WebSocketHandler from 'helpers/ws';
 import { getStorage } from 'helpers/utils';
+import { ControllerContext } from 'store/contexts';
 
 import { toggleAutopilot } from 'store/modules/automation';
 import { createRemoteBrowser } from 'store/modules/remoteBrowsers';
@@ -16,9 +17,7 @@ const CBrowser = !__DESKTOP__ && !__PLAYER__ && __CLIENT__ && require('shepherd-
 
 
 class RemoteBrowserUI extends Component {
-  static contextTypes = {
-    currMode: PropTypes.string
-  };
+  static contextType = ControllerContext;
 
   static propTypes = {
     behavior: PropTypes.string,

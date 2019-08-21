@@ -15,20 +15,6 @@ class CollectionManagement extends Component {
     history: PropTypes.object
   };
 
-  // TODO move to HOC
-  static childContextTypes = {
-    canAdmin: PropTypes.bool
-  };
-
-  getChildContext() {
-    const { auth, match: { params: { user } } } = this.props;
-    const username = auth.getIn(['user', 'username']);
-
-    return {
-      canAdmin: username === user
-    };
-  }
-
   render() {
     return (
       <CollectionManagementUI {...this.props} />

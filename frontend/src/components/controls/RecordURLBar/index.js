@@ -3,6 +3,8 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
+import { ControllerContext } from 'store/contexts';
+
 import { ExtractWidget, PatchWidget, RemoteBrowserSelect } from 'containers';
 
 import { remoteBrowserMod } from 'helpers/utils';
@@ -11,10 +13,7 @@ import './style.scss';
 
 
 class RecordURLBar extends Component {
-  static contextTypes = {
-    canAdmin: PropTypes.bool,
-    currMode: PropTypes.string
-  };
+  static contextType = ControllerContext;
 
   static propTypes = {
     activeBrowser: PropTypes.string,
