@@ -6,6 +6,7 @@ import { fromJS } from 'immutable';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { stopPropagation } from 'helpers/utils';
+import { AppContext } from 'store/contexts';
 
 import { StandaloneRecorder } from 'containers';
 
@@ -22,9 +23,7 @@ import './style.scss';
 
 
 class CollectionListUI extends Component {
-  static contextTypes = {
-    isAnon: PropTypes.bool
-  };
+  static contextType = AppContext;
 
   static propTypes = {
     auth: PropTypes.object,

@@ -386,6 +386,7 @@ class CollectionDetailUI extends Component {
           collection,
           deselect: this.deselect,
           displayObjects,
+          isMobile: this.context.isMobile,
           list,
           onKeyNavigate: this.onKeyNavigate,
           onSelectRow: this.onSelectRow,

@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { defaultBookmarkDesc, untitledEntry } from 'config';
 import { getCollectionLink } from 'helpers/utils';
 
+import { ControllerContext } from 'store/contexts';
+
 import InlineEditor from 'components/InlineEditor';
 import RemoteBrowserDisplay from 'components/collection/RemoteBrowserDisplay';
 import SidebarHeader from 'components/SidebarHeader';
@@ -16,9 +18,7 @@ import './style.scss';
 
 
 class InspectorPanelUI extends PureComponent {
-  static contextTypes = {
-    canAdmin: PropTypes.bool
-  };
+  static contextType = ControllerContext;
 
   static propTypes = {
     bkEdited: PropTypes.bool,

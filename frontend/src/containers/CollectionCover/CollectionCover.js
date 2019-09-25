@@ -5,36 +5,28 @@ import { Map } from 'immutable';
 
 import { timestampOrderedPages } from 'store/selectors';
 
-import { isLoaded as isCollLoaded, load as loadColl, loadLists } from 'store/modules/collection';
+import { load as loadColl, loadLists } from 'store/modules/collection';
 import { isLoaded as isRBLoaded, load as loadRB } from 'store/modules/remoteBrowsers';
 import { getQueryPages, getOrderedPages } from 'store/selectors';
 import { pageSearchResults } from 'store/selectors/search';
+import { AccessContext } from 'store/contexts';
 
 import CollectionCoverUI from 'components/collection/CollectionCoverUI';
 
 class CollectionCover extends Component {
-  static childContextTypes = {
-    canAdmin: PropTypes.bool
-  };
-
   static propTypes = {
     auth: PropTypes.object,
-    location: PropTypes.object,
     match: PropTypes.object
   };
 
-  getChildContext() {
-    const { auth, location: { search }, match: { params: { user } } } = this.props;
-    const username = auth.getIn(['user', 'username']);
-
-    return {
-      canAdmin: username === user
-    };
-  }
-
   render() {
+    const { auth, match: { params: { user } } } = this.props;
+    const contextValues = { canAdmin: auth.getIn(['user', 'username']) === user };
+
     return (
-      <CollectionCoverUI {...this.props} />
+      <AccessContext.Provider value={contextValues}>
+        <CollectionCoverUI {...this.props} />
+      </AccessContext.Provider>
     );
   }
 }

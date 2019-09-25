@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import { remoteBrowserMod } from 'helpers/utils';
 import { ControllerContext } from 'store/contexts';
@@ -87,4 +86,4 @@ class ReplayURLBar extends Component {
   }
 }
 
-export default withRouter(ReplayURLBar);
+export default ReplayURLBar;

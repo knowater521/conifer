@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
+import { withRouter } from 'react-router';
 
 import { AppContext, ControllerContext } from 'store/contexts';
 
@@ -126,4 +127,4 @@ class ReplayUI extends Component {
   }
 }
 
-export default ReplayUI;
+export default withRouter(ReplayUI);

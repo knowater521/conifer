@@ -4,15 +4,15 @@ import { indexResource } from 'redux-search/dist/commonjs/actions';
 
 import { columns } from 'config';
 
+import { AccessContext } from 'store/contexts';
+
 import { QueryBox } from 'containers';
 
 import Searchbox from 'components/Searchbox';
 
 
 class CollectionFiltersUI extends PureComponent {
-  static contextTypes = {
-    canAdmin: PropTypes.bool
-  };
+  static contextType = AccessContext;
 
   static propTypes = {
     collection: PropTypes.object,

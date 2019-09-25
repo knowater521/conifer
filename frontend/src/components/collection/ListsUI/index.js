@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { draggableTypes } from 'config';
 import { getCollectionLink, keyIn } from 'helpers/utils';
 
+import { AccessContext } from 'store/contexts';
+
 import Modal from 'components/Modal';
 import VisibilityLamp from 'components/collection/VisibilityLamp';
 import { AllPagesIcon, CheckIcon, PlusIcon, XIcon } from 'components/icons';
@@ -19,9 +21,7 @@ import './style.scss';
 
 class ListsUI extends Component {
 
-  static contextTypes = {
-    canAdmin: PropTypes.bool
-  };
+  static contextType = AccessContext;
 
   static propTypes = {
     activeListSlug: PropTypes.string,
