@@ -62,13 +62,6 @@ class Replay extends Component {
     this.state = { collectionNav: !props.match.params.listSlug };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { match: { params: { listSlug } } } = this.props;
-    if (listSlug !== nextProps.match.params.listSlug && this.state.collectionNav) {
-      this.setState({ collectionNav: false });
-    }
-  }
-
   shouldComponentUpdate(nextProps) {
     // don't rerender for loading changes
     if (!nextProps.loaded) {
@@ -76,6 +69,14 @@ class Replay extends Component {
     }
 
     return true;
+  }
+
+  componentDidUpdate(prevProps) {
+    const { match: { params: { listSlug } } } = prevProps;
+
+    if (listSlug !== this.props.match.params.listSlug && this.state.collectionNav) {
+      this.setState({ collectionNav: false });
+    }
   }
 
   componentWillUnmount() {

@@ -41,26 +41,12 @@ class SidebarListViewer extends Component {
   constructor(props) {
     super(props);
 
+    const { activeBookmark, bookmarks, setInspector } = props;
+    setInspector(bookmarks.getIn([activeBookmark, 'id']));
+
     this.state = {
       navigated: false
     };
-  }
-
-  componentWillMount() {
-    const { activeBookmark, bookmarks, setInspector } = this.props;
-    setInspector(bookmarks.getIn([activeBookmark, 'id']));
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { activeBookmark, bookmarks, timestamp, url } = this.props;
-
-    // change in iframe source, active bookmark with no bookmark id change
-    if ((url !== nextProps.url || timestamp !== nextProps.timestamp) && activeBookmark > -1 && activeBookmark === nextProps.activeBookmark) {
-      const bkObj = bookmarks.get(activeBookmark);
-      if (bkObj.get('url') !== nextProps.url || bkObj.get('timestamp') !== nextProps.timestamp) {
-        this.setState({ navigated: true });
-      }
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -73,9 +59,17 @@ class SidebarListViewer extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { activeBookmark, bookmarks, setInspector } = this.props;
+    const { activeBookmark, bookmarks, setInspector, timestamp, url } = this.props;
+
     if (activeBookmark !== prevProps.activeBookmark) {
       setInspector(bookmarks.getIn([activeBookmark, 'id']));
+    }
+
+    if ((prevProps.url !== url || prevProps.timestamp !== timestamp) && activeBookmark > -1 && prevProps.activeBookmark === activeBookmark) {
+      const bkObj = bookmarks.get(activeBookmark);
+      if (bkObj.get('url') !== url || bkObj.get('timestamp') !== timestamp) {
+        this.setState({ navigated: true });
+      }
     }
   }
 

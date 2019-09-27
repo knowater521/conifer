@@ -75,43 +75,34 @@ class IFrame extends Component {
     this.socket = new WebSocketHandler(params, currMode, dispatch);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     const { activeBookmarkId, appPrefix, behavior, contentPrefix, url, timestamp } = this.props;
 
-    if (behavior !== nextProps.behavior && this.contentFrame) {
+    if (behavior !== prevProps.behavior && this.contentFrame) {
       this.contentFrame.iframe.contentWindow.postMessage({
         wb_type: 'behavior',
-        name: nextProps.behavior,
+        name: behavior,
         url,
-        start: !!nextProps.behavior,
+        start: !!behavior,
       }, '*', undefined, true);
 
-      if (nextProps.behavior) {
-        this.socket.behaviorStat('start', nextProps.behavior);
+      if (behavior) {
+        this.socket.behaviorStat('start', behavior);
       }
     }
 
-    if (nextProps.url !== url || nextProps.timestamp !== timestamp ||
-        nextProps.activeBookmarkId !== activeBookmarkId) {
+    if (prevProps.url !== url || prevProps.timestamp !== timestamp ||
+        prevProps.activeBookmarkId !== activeBookmarkId) {
       // check whether this is an update from the content frame or user action
       if (!this.internalUpdate) {
         if (this.context.currMode.includes('replay')) {
           this.contentFrame.app_prefix = typeof appPrefix !== 'string' ? appPrefix() : appPrefix;
           this.contentFrame.content_prefix = typeof contentPrefix !== 'string' ? contentPrefix() : contentPrefix;
         }
-        this.contentFrame.load_url(nextProps.url, nextProps.timestamp);
+        this.contentFrame.load_url(url, timestamp);
       }
       this.internalUpdate = false;
     }
-  }
-
-  shouldComponentUpdate(nextProps) {
-    // only rerender when pointer events change occurs (for resizing)
-    if (nextProps.passEvents !== this.props.passEvents) {
-      return true;
-    }
-
-    return false;
   }
 
   componentWillUnmount() {

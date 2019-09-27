@@ -68,21 +68,21 @@ class ListsUI extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     const { isCreating, created, isEditing, edited } = this.state;
 
-    if (isCreating && !created && this.props.lists !== nextProps.lists) {
+    if (isCreating && !created && prevProps.lists !== this.props.lists) {
       this.setState({ title: '', isCreating: false, created: true });
       this.createHandle = setTimeout(() => { this.setState({ created: false, isCreating: false }); }, 3000);
     }
 
-    if (isEditing && !edited && this.props.lists !== nextProps.lists) {
+    if (isEditing && !edited && prevProps.lists !== this.props.lists) {
       this.setState({ isEditing: false, edited: true });
       this.editHandle = setTimeout(() => { this.setState({ edited: false, isEditing: false, editId: null }); }, 5000);
     }
 
-    if (nextProps.lists !== this.props.lists) {
-      this.setState({ lists: nextProps.lists });
+    if (this.props.lists !== prevProps.lists) {
+      this.setState({ lists: this.props.lists });
     }
   }
 

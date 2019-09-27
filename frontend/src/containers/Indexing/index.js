@@ -30,10 +30,6 @@ class Indexing extends Component {
     };
   }
 
-  componentWillMount() {
-    //this.props.dispatch(clearColl());
-  }
-
   componentDidMount() {
     const { host } = this.props;
     const reqUrl = `${host}/_upload/@INIT?user=local`;

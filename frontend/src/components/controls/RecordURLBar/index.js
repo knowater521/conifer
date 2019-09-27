@@ -31,9 +31,9 @@ class RecordURLBar extends Component {
     this.state = { url: props.url || '' };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.url !== this.props.url) {
-      this.setState({ url: nextProps.url });
+  componentDidUpdate(prevProps) {
+    if (this.props.url !== prevProps.url) {
+      this.setState({ url: this.props.url });
     }
   }
 

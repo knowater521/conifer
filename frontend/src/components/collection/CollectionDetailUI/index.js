@@ -81,27 +81,13 @@ class CollectionDetailUI extends Component {
       overrideHeight: null,
       selectedPageIdx: null
     };
-  }
 
-  componentWillMount() {
     this.props.clearInspector();
   }
 
   componentDidMount() {
     if (!this.context.isMobile) {
       document.addEventListener('keydown', this.handleKeyInput);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.list !== this.props.list) {
-      const bookmarks = nextProps.list.get('bookmarks');
-      this.setState({ listBookmarks: bookmarks, sortedBookmarks: bookmarks });
-    }
-
-    // clear querybox if removed from url
-    if (this.props.location.search.includes('query') && !nextProps.location.search.includes('query')) {
-      this.props.clearQuery();
     }
   }
 
@@ -120,6 +106,16 @@ class CollectionDetailUI extends Component {
       if (this.props.searchText) {
         this.props.clearSearch();
       }
+    }
+
+    if (this.props.list !== prevProps.list) {
+      const bookmarks = this.props.list.get('bookmarks');
+      this.setState({ listBookmarks: bookmarks, sortedBookmarks: bookmarks });
+    }
+
+    // clear querybox if removed from url
+    if (prevProps.location.search.includes('query') && !this.props.location.search.includes('query')) {
+      this.props.clearQuery();
     }
   }
 

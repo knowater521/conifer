@@ -28,8 +28,10 @@ class SidebarPageViewer extends Component {
     showNavigator: PropTypes.func
   }
 
-  componentWillMount() {
-    const { activePage, pages, setInspector } = this.props;
+  constructor(props) {
+    super(props);
+
+    const { activePage, pages, setInspector } = props;
     setInspector(pages.getIn([activePage, 'id']));
   }
 

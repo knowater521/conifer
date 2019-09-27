@@ -85,30 +85,31 @@ class Webview extends Component {
     ipcRenderer.on('toggle-devtools', this.toggleDevTools);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { behavior, timestamp, url } = this.props;
-
-    // behavior check
-    if (behavior !== nextProps.behavior) {
-      this.doBehavior(nextProps.url, nextProps.behavior);
-    }
-
-    if (nextProps.url !== url || nextProps.timestamp !== timestamp) {
-      if (!this.internalUpdate) {
-        this.setState({ loading: true });
-        this.clearCookies();
-        this.webviewHandle.loadURL(this.buildProxyUrl(nextProps.url, nextProps.timestamp));
-      }
-      this.internalUpdate = false;
-    }
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     if (nextState.loading !== this.state.loading) {
       return true;
     }
 
     return false;
+  }
+
+  componentDidUpdate(prevProps) {
+    const { behavior, timestamp, url } = this.props;
+
+    // behavior check
+    if (behavior !== prevProps.behavior) {
+      this.doBehavior(url, behavior);
+    }
+
+    if (prevProps.url !== url || prevProps.timestamp !== timestamp) {
+      if (!this.internalUpdate) {
+        this.setState({ loading: true });
+
+        this.clearCookies();
+        this.webviewHandle.loadURL(this.buildProxyUrl(url, timestamp));
+      }
+      this.internalUpdate = false;
+    }
   }
 
   componentWillUnmount() {

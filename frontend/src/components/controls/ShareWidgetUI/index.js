@@ -48,15 +48,13 @@ class ShareWidgetUI extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
-    if (nextProps.isPublic && nextProps.collection !== this.props.collection) {
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.open && this.state.open) {
       this.thirdPartyJS();
       this.buildSocialWidgets();
     }
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (!prevState.open && this.state.open) {
+    if (this.props.isPublic && this.props.collection !== prevProps.collection) {
       this.thirdPartyJS();
       this.buildSocialWidgets();
     }
