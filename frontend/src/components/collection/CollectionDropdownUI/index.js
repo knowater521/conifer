@@ -135,6 +135,13 @@ class CollectionDropdownUI extends Component {
     });
   }
 
+  keydown = (evt) => {
+    // block spacebar from triggering dropdown
+    if (evt.keyCode === 32) {
+      evt.stopPropagation();
+    }
+  }
+
   toggle = () => {
     this.setState({ showModal: !this.state.showModal });
   }
@@ -172,6 +179,7 @@ class CollectionDropdownUI extends Component {
                         autoComplete="off"
                         className="form-control"
                         name="filter"
+                        onKeyDown={this.keydown}
                         onChange={this.filterCollections}
                         onClick={this.captureClick}
                         placeholder="Filter collections..."
