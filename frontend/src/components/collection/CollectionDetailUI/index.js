@@ -93,7 +93,7 @@ class CollectionDetailUI extends Component {
 
   shouldComponentUpdate(nextProps) {
     // don't rerender for loading changes
-    if (!nextProps.loaded) {
+    if (!nextProps.loaded && this.props.list === nextProps.list) {
       return false;
     }
 
@@ -372,7 +372,7 @@ class CollectionDetailUI extends Component {
                 pages={objects}
                 pageSelection={selectedPageIdx} />
             </Resizable>
-            <InspectorPanel />
+            <InspectorPanel canAdmin={canAdmin} />
           </div>
         </Sidebar>
 

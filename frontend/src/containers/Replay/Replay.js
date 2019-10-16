@@ -119,8 +119,9 @@ class Replay extends Component {
     } = this.props;
     const { coll, rec, user } = params;
 
+    const canAdmin = auth.getIn(['user', 'username']) === user;
     const contextValues = {
-      canAdmin: auth.getIn(['user', 'username']) === user,
+      canAdmin,
       currMode: this.mode,
       coll,
       user,
@@ -161,7 +162,6 @@ class Replay extends Component {
       );
     }
 
-    const canAdmin = auth.getIn(['user', 'username']) === user;
     const tsMod = remoteBrowserMod(activeBrowser, timestamp);
     const { listSlug } = params;
     const bkId = params.bookmarkId;
@@ -227,7 +227,7 @@ class Replay extends Component {
                     </TabPanel>
                   </Tabs>
                 </Resizable>
-                <InspectorPanel />
+                <InspectorPanel canAdmin={canAdmin} />
               </Sidebar>
           }
           {

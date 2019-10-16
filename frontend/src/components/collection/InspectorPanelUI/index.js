@@ -2,10 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
-import { defaultBookmarkDesc, untitledEntry } from 'config';
+import { untitledEntry } from 'config';
 import { getCollectionLink } from 'helpers/utils';
-
-import { ControllerContext } from 'store/contexts';
 
 import InlineEditor from 'components/InlineEditor';
 import RemoteBrowserDisplay from 'components/collection/RemoteBrowserDisplay';
@@ -18,11 +16,10 @@ import './style.scss';
 
 
 class InspectorPanelUI extends PureComponent {
-  static contextType = ControllerContext;
-
   static propTypes = {
     bkEdited: PropTypes.bool,
     browsers: PropTypes.object,
+    canAdmin: PropTypes.bool,
     collection: PropTypes.object,
     list: PropTypes.object,
     multiSelect: PropTypes.number,
@@ -53,9 +50,8 @@ class InspectorPanelUI extends PureComponent {
   editBookmarkDesc = desc => this.saveEdit({ desc })
 
   render() {
-    const { canAdmin } = this.context;
     const {
-      bkEdited, browsers, collection, list, multiSelect,
+      bkEdited, browsers, canAdmin, collection, list, multiSelect,
       selectedPage, selectedBk
     } = this.props;
 
@@ -130,7 +126,7 @@ class InspectorPanelUI extends PureComponent {
                               {
                                 canAdmin ?
                                   <Link to={`${getCollectionLink(collection)}/management?session=${pg.get('rec')}`}>{pg.get('rec')}</Link> :
-                                  <Link to={`${getCollectionLink(collection, true)}?query=session:${pg.get('rec')}`}>{pg.get('rec')}</Link>
+                                  <Link to={`${getCollectionLink(collection)}?query=session:${pg.get('rec')}`}>{pg.get('rec')}</Link>
                               }
                             </span>
                           </li>
