@@ -4,6 +4,7 @@ import { asyncConnect } from 'redux-connect';
 
 import { load as loadColl } from 'store/modules/collection';
 import { getOrderedRecordings } from 'store/selectors';
+import { AccessContext } from 'store/contexts';
 
 import CollectionManagementUI from 'components/collection/CollectionManagementUI';
 
@@ -16,8 +17,12 @@ class CollectionManagement extends Component {
   };
 
   render() {
+    const { auth, match: { params: { user } } } = this.props;
+    const canAdmin = auth.getIn(['user', 'username']) === user;
     return (
-      <CollectionManagementUI {...this.props} />
+      <AccessContext.Provider value={{ canAdmin }}>
+        <CollectionManagementUI {...this.props} />
+      </AccessContext.Provider>
     );
   }
 }

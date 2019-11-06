@@ -117,7 +117,7 @@ class RemoteBrowserUI extends Component {
       this.socket.doBehavior(url, behavior);
     }
 
-    if (url != prevProps.url) {
+    if (url !== prevProps.url && this.socket) {
       this.socket.setRemoteUrl(url);
     }
 
