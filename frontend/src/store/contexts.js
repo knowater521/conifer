@@ -9,11 +9,3 @@ export const AppContext = createContext({
   isEmbed: false,
   isMobile: false
 });
-
-export const ControllerContext = createContext({
-  canAdmin: false,
-  currMode: '',
-  coll: '',
-  rec: '',
-  user: ''
-});

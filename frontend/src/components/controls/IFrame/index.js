@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import config from 'config';
 import WebSocketHandler from 'helpers/ws';
-import { ControllerContext } from 'store/contexts';
 
 import { autopilotReady, toggleAutopilot, updateBehaviorState, updateBehaviorMessage } from 'store/modules/automation';
 import { setMethod, updateTimestamp, updateUrl } from 'store/modules/controls';
@@ -15,8 +14,6 @@ import './style.scss';
 
 
 class IFrame extends Component {
-  static contextType = ControllerContext;
-
   static propTypes = {
     activeBookmarkId: PropTypes.string,
     auth: PropTypes.object,
@@ -42,8 +39,7 @@ class IFrame extends Component {
   }
 
   componentDidMount() {
-    const { appPrefix, contentPrefix, dispatch, params, url } = this.props;
-    const { currMode } = this.context;
+    const { appPrefix, contentPrefix, currMode, dispatch, params, url } = this.props;
 
     window.addEventListener('message', this.handleReplayEvent);
 
@@ -95,7 +91,7 @@ class IFrame extends Component {
         prevProps.activeBookmarkId !== activeBookmarkId) {
       // check whether this is an update from the content frame or user action
       if (!this.internalUpdate) {
-        if (this.context.currMode.includes('replay')) {
+        if (this.props.currMode.includes('replay')) {
           this.contentFrame.app_prefix = typeof appPrefix !== 'string' ? appPrefix() : appPrefix;
           this.contentFrame.content_prefix = typeof contentPrefix !== 'string' ? contentPrefix() : contentPrefix;
         }
@@ -209,8 +205,7 @@ class IFrame extends Component {
   }
 
   addNewPage = (state, doAdd = false) => {
-    const { currMode } = this.context;
-    const { params, timestamp } = this.props;
+    const { currMode, params, timestamp } = this.props;
 
     // if (state && state.ts && currMode !== 'record' && currMode.indexOf('extract') === -1 && state.ts !== timestamp) {
     //   this.props.dispatch(updateTimestamp(state.ts));

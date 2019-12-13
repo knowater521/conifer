@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { ControllerContext } from 'store/contexts';
-
 import { ExtractWidget, PatchWidget, RemoteBrowserSelect } from 'containers';
 
 import { remoteBrowserMod } from 'helpers/utils';
@@ -12,12 +10,12 @@ import './style.scss';
 
 
 class RecordURLBar extends Component {
-  static contextType = ControllerContext;
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     activeCollection: PropTypes.object,
     autopilotRunning: PropTypes.bool,
+    canAdmin: PropTypes.bool,
+    currMode: PropTypes.string,
     history: PropTypes.object,
     params: PropTypes.object,
     timestamp: PropTypes.string,
@@ -43,8 +41,7 @@ class RecordURLBar extends Component {
   }
 
   handleSubmit = (evt) => {
-    const { currMode } = this.context;
-    const { activeBrowser, history, params: { archiveId, coll, collId, extractMode, rec, user }, timestamp } = this.props;
+    const { activeBrowser, currMode, history, params: { archiveId, coll, collId, extractMode, rec, user }, timestamp } = this.props;
     const { url } = this.state;
 
     if (evt.key === 'Enter') {
@@ -70,8 +67,7 @@ class RecordURLBar extends Component {
   }
 
   render() {
-    const { currMode, canAdmin } = this.context;
-    const { activeCollection, autopilotRunning, params } = this.props;
+    const { activeCollection, autopilotRunning, currMode, canAdmin, params } = this.props;
     const { url } = this.state;
 
     const isNew = currMode === 'new';
@@ -89,6 +85,7 @@ class RecordURLBar extends Component {
                     <RemoteBrowserSelect
                       active
                       autopilotRunning={autopilotRunning}
+                      currMode={currMode}
                       params={params} />
                   }
                 </div>

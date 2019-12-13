@@ -16,7 +16,7 @@ import { resetStats } from 'store/modules/infoStats';
 import { listLoaded, load as loadList } from 'store/modules/list';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
 import { toggle as toggleSidebar } from 'store/modules/sidebar';
-import { AppContext, ControllerContext } from 'store/contexts';
+import { AppContext } from 'store/contexts';
 
 import EmbedFooter from 'components/EmbedFooter';
 import HttpStatus from 'components/HttpStatus';
@@ -120,13 +120,6 @@ class Replay extends Component {
     const { coll, rec, user } = params;
 
     const canAdmin = auth.getIn(['user', 'username']) === user;
-    const contextValues = {
-      canAdmin,
-      currMode: this.mode,
-      coll,
-      user,
-      rec
-    };
 
     // coll access
     if (collection.get('error')) {
@@ -180,7 +173,7 @@ class Replay extends Component {
       <meta property="og:description" content={collection.get('desc') ? truncate(collection.get('desc'), 3, new RegExp(/([.!?])/)) : config.tagline} />;
 
     return (
-      <ControllerContext.Provider value={contextValues}>
+      <React.Fragment>
         <Helmet>
           <title>{title}</title>
           <meta property="og:url" content={shareUrl} />
@@ -192,6 +185,8 @@ class Replay extends Component {
           !isEmbed &&
             <ReplayUI
               activeBrowser={activeBrowser}
+              canAdmin={canAdmin}
+              currMode={this.mode}
               canGoBackward={__DESKTOP__ ? appSettings.get('canGoBackward') : false}
               canGoForward={__DESKTOP__ ? appSettings.get('canGoForward') : false}
               params={params}
@@ -219,7 +214,7 @@ class Replay extends Component {
                           (<SidebarCollectionViewer
                             activeList={listSlug}
                             showNavigator={this.showCollectionNav} />) :
-                          <SidebarListViewer showNavigator={this.showCollectionNav} />
+                          <SidebarListViewer canAdmin={canAdmin} showNavigator={this.showCollectionNav} />
                       }
                     </TabPanel>
                     <TabPanel>
@@ -233,6 +228,7 @@ class Replay extends Component {
           {
             __DESKTOP__ &&
               <Webview
+                currMode={this.mode}
                 key="webview"
                 host={appSettings.get('host')}
                 params={params}
@@ -241,7 +237,8 @@ class Replay extends Component {
                 canGoBackward={appSettings.get('canGoBackward')}
                 canGoForward={appSettings.get('canGoForward')}
                 partition={`persist:${user}-replay`}
-                url={url} />
+                url={url}
+                {...{ coll, user, rec }} />
           }
           {
 
@@ -252,6 +249,7 @@ class Replay extends Component {
             !__DESKTOP__ && (
               activeBrowser ?
                 <RemoteBrowser
+                  currMode={this.mode}
                   params={params}
                   rb={activeBrowser}
                   rec={recording}
@@ -259,10 +257,11 @@ class Replay extends Component {
                   url={url} /> :
                 <IFrame
                   activeBookmarkId={activeBookmarkId}
+                  appPrefix={this.getAppPrefix}
                   auth={this.props.auth}
                   behavior={this.props.behavior}
-                  appPrefix={this.getAppPrefix}
                   contentPrefix={this.getContentPrefix}
+                  currMode={this.mode}
                   dispatch={dispatch}
                   params={params}
                   passEvents={this.props.sidebarResize}
@@ -271,7 +270,7 @@ class Replay extends Component {
             )
           }
         </div>
-      </ControllerContext.Provider>
+      </React.Fragment>
     );
   }
 }

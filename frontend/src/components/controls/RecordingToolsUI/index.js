@@ -5,7 +5,6 @@ import { Button } from 'react-bootstrap';
 
 import { appHost, product } from 'config';
 import { apiFetch } from 'helpers/utils';
-import { ControllerContext } from 'store/contexts';
 
 import { ShareWidget } from 'containers';
 
@@ -16,12 +15,12 @@ import './style.scss';
 
 
 class RecordingToolsUI extends PureComponent {
-  static contextType = ControllerContext;
-
   static propTypes = {
     activeBrowser: PropTypes.string,
     auth: PropTypes.object,
     autopilotInfo: PropTypes.object,
+    canAdmin: PropTypes.bool,
+    currMode: PropTypes.string,
     history: PropTypes.object,
     autopilot: PropTypes.bool,
     match: PropTypes.object,
@@ -38,7 +37,7 @@ class RecordingToolsUI extends PureComponent {
   }
 
   onPatch = () => {
-    if (this.context.currMode === 'record') return;
+    if (this.props.currMode === 'record') return;
 
     const { activeBrowser, history, match: { params: { coll } }, timestamp, url } = this.props;
 
@@ -62,7 +61,7 @@ class RecordingToolsUI extends PureComponent {
   }
 
   onRecord = () => {
-    if (this.context.currMode === 'record') return;
+    if (this.props.currMode === 'record') return;
 
     const { activeBrowser, history, match: { params: { coll } }, url } = this.props;
     const data = {
@@ -103,8 +102,7 @@ class RecordingToolsUI extends PureComponent {
   }
 
   render() {
-    const { canAdmin, currMode } = this.context;
-    const { activeBrowser, autopilotInfo } = this.props;
+    const { activeBrowser, autopilotInfo, canAdmin, currMode } = this.props;
 
     const isNew = currMode === 'new';
     const isWrite = ['new', 'patch', 'record', 'extract', 'live'].includes(currMode);
@@ -144,7 +142,7 @@ class RecordingToolsUI extends PureComponent {
 
         {
           !isWrite && !__DESKTOP__ &&
-            <ShareWidget />
+            <ShareWidget canAdmin={canAdmin} />
         }
       </div>
     );

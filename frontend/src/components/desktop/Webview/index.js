@@ -6,7 +6,6 @@ import { withRouter } from 'react-router';
 
 import { apiFetch, stripProtocol, setTitle } from 'helpers/utils';
 import { autopilotCheck, autopilotReset, autopilotReady, toggleAutopilot, updateBehaviorState, updateBehaviorMessage } from 'store/modules/automation';
-import { ControllerContext } from 'store/contexts';
 
 import { setBrowserHistory } from 'store/modules/appSettings';
 import { setMethod, updateTimestamp, updateUrl } from 'store/modules/controls';
@@ -19,12 +18,11 @@ const { ipcRenderer } = window.require('electron');
 
 
 class Webview extends Component {
-  static contextType = ControllerContext;
-
   static propTypes = {
     behavior: PropTypes.string,
     canGoBackward: PropTypes.bool,
     canGoForward: PropTypes.bool,
+    currMode: PropTypes.string,
     dispatch: PropTypes.func,
     history: PropTypes.object,
     host: PropTypes.string,
@@ -45,8 +43,7 @@ class Webview extends Component {
   }
 
   componentDidMount() {
-    const { currMode } = this.context;
-    const { dispatch, host, params } = this.props;
+    const { currMode, dispatch, host, params } = this.props;
 
     const realHost = host || appHost;
 
@@ -123,7 +120,7 @@ class Webview extends Component {
   }
 
   buildProxyUrl(url, timestamp) {
-    const { user, coll, rec, currMode } = this.context;
+    const { user, coll, rec, currMode } = this.props;
     if (currMode === "live") {
       return url;
     }
@@ -139,7 +136,7 @@ class Webview extends Component {
   }
 
   clearCookies() {
-    const { currMode } = this.context;
+    const { currMode } = this.props;
 
     if (currMode === 'replay-coll') {
       ipcRenderer.send('clear-cookies', true);
@@ -172,8 +169,7 @@ class Webview extends Component {
   }
 
   handleIPCEvent = (evt) => {
-    const { canGoBackward, canGoForward, dispatch } = this.props;
-    const { currMode } = this.context;
+    const { currMode, canGoBackward, canGoForward, dispatch } = this.props;
     const state = evt.args[0];
 
     // set back & forward availability
@@ -200,6 +196,7 @@ class Webview extends Component {
         if (state.newPage) {
           this.addNewPage(state, true);
         }
+
         if (state.readyState === 'interactive') {
           dispatch(setMethod('navigation'));
           dispatch(autopilotReset());
@@ -233,7 +230,6 @@ class Webview extends Component {
 
   setUrl = (url, noStatsUpdate = false) => {
     const rawUrl = decodeURI(url);
-
     if (this.props.url !== rawUrl) {
       this.internalUpdate = true;
       this.props.dispatch(updateUrl(rawUrl));
@@ -245,8 +241,7 @@ class Webview extends Component {
   }
 
   addNewPage = (state, doAdd = false) => {
-    const { currMode } = this.context;
-    const { params, timestamp } = this.props;
+    const { currMode, params, timestamp } = this.props;
 
     // if (state && state.ts && currMode !== 'record' && currMode.indexOf('extract') === -1 && state.ts !== timestamp) {
     //   this.props.dispatch(updateTimestamp(state.ts));
@@ -256,21 +251,21 @@ class Webview extends Component {
       this.setUrl(state.url);
     } else if (['record', 'patch', 'extract', 'extract_only'].includes(currMode)) {
 
-      if (state.ts) {
-        if (state.ts !== timestamp) {
-          this.internalUpdate = true;
-          this.props.dispatch(updateTimestamp(state.ts));
-        }
+      // if (state.ts) {
+      //   if (state.ts !== timestamp) {
+      //     this.internalUpdate = true;
+      //     this.props.dispatch(updateTimestamp(state.ts));
+      //   }
 
-        //window.wbinfo.timestamp = state.ts;
-      }
+      //   //window.wbinfo.timestamp = state.ts;
+      // }
 
       this.setUrl(state.url, true);
 
       const modeMsg = { record: 'recording', patch: 'Patching', extract: 'Extracting' };
       setTitle(currMode in modeMsg ? modeMsg[currMode] : '', state.url, state.tittle);
 
-      if (doAdd && state.newPage && (state.ts || currMode !== 'patch')) {
+      if (doAdd && state.newPage) { // && (state.ts || currMode !== 'patch')
         if (!this.socket.addPage(state)) {
           apiFetch(`/recording/${params.rec}/pages?user=${params.user}&coll=${params.coll}`, state, { method: 'POST' });
         }

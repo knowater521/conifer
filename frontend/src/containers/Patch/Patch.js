@@ -10,7 +10,6 @@ import { isLoaded, load as loadColl } from 'store/modules/collection';
 import { getArchives, updateUrlAndTimestamp } from 'store/modules/controls';
 import { resetStats } from 'store/modules/infoStats';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
-import { ControllerContext } from 'store/contexts';
 
 import { Autopilot, RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -53,19 +52,12 @@ class Patch extends Component {
     const { activeBrowser, appSettings, auth, autopilotRunning, dispatch, match: { params }, timestamp, url } = this.props;
     const { user, coll, rec } = params;
 
-    const contextValues = {
-      canAdmin: auth.getIn(['user', 'username']) === params.user,
-      currMode: this.mode,
-      coll: params.coll,
-      user: params.user,
-      rec: params.rec,
-    };
-
+    const canAdmin = auth.getIn(['user', 'username']) === params.user;
     const appPrefix = `${config.appHost}/${user}/${coll}/${rec}/patch/`;
     const contentPrefix = `${config.contentHost}/${user}/${coll}/${rec}/patch/`;
 
     return (
-      <ControllerContext.Provider value={contextValues}>
+      <React.Fragment>
         <Helmet>
           <title>Patching</title>
         </Helmet>
@@ -74,6 +66,8 @@ class Patch extends Component {
           autopilotRunning={autopilotRunning}
           canGoBackward={__DESKTOP__ ? appSettings.get('canGoBackward') : false}
           canGoForward={__DESKTOP__ ? appSettings.get('canGoForward') : false}
+          canAdmin={canAdmin}
+          currMode={this.mode}
           params={params}
           timestamp={timestamp}
           url={url} />
@@ -84,19 +78,21 @@ class Patch extends Component {
                 behavior={this.props.behavior}
                 canGoBackward={appSettings.get('canGoBackward')}
                 canGoForward={appSettings.get('canGoForward')}
+                currMode={this.mode}
                 dispatch={dispatch}
                 host={appSettings.get('host')}
                 key="webview"
                 params={params}
                 partition={`persist:${params.user}`}
                 timestamp={timestamp}
-                url={url} />
+                url={url}
+                {...{ coll, user, rec }} />
           }
-
           {
             !__DESKTOP__ && (
               activeBrowser ?
                 <RemoteBrowser
+                  currMode={this.mode}
                   params={params}
                   rb={activeBrowser}
                   rec={rec}
@@ -106,6 +102,7 @@ class Patch extends Component {
                   auth={this.props.auth}
                   behavior={this.props.behavior}
                   contentPrefix={contentPrefix}
+                  currMode={this.mode}
                   dispatch={dispatch}
                   params={params}
                   timestamp={timestamp}
@@ -115,7 +112,7 @@ class Patch extends Component {
 
           <Autopilot />
         </div>
-      </ControllerContext.Provider>
+      </React.Fragment>
     );
   }
 }

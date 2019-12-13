@@ -7,7 +7,6 @@ import config from 'config';
 
 import { isLoaded, load as loadColl } from 'store/modules/collection';
 import { updateUrl } from 'store/modules/controls';
-import { ControllerContext } from 'store/contexts';
 
 import { RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -53,19 +52,12 @@ class Live extends Component {
     const { activeBrowser, appSettings, auth, dispatch, match: { params }, timestamp, url } = this.props;
     const { user, coll, rec } = params;
 
-    const contextValues = {
-      canAdmin: auth.getIn(['user', 'username']) === params.user,
-      currMode: this.mode,
-      coll,
-      user,
-      rec
-    };
-
+    const canAdmin = auth.getIn(['user', 'username']) === params.user;
     const appPrefix = `${config.appHost}/${user}/live/`;
     const contentPrefix = `${config.contentHost}/${user}/live/`;
 
     return (
-      <ControllerContext.Provider value={contextValues}>
+      <React.Fragment>
         <Helmet>
           <title>Previewing</title>
         </Helmet>
@@ -73,6 +65,8 @@ class Live extends Component {
           activeBrowser={activeBrowser}
           canGoBackward={__DESKTOP__ ? appSettings.get('canGoBackward') : false}
           canGoForward={__DESKTOP__ ? appSettings.get('canGoForward') : false}
+          canAdmin={canAdmin}
+          currMode={this.mode}
           params={params}
           url={url} />
 
@@ -80,21 +74,24 @@ class Live extends Component {
           {
             __DESKTOP__ &&
               <Webview
+                canGoBackward={appSettings.get('canGoBackward')}
+                canGoForward={appSettings.get('canGoForward')}
+                currMode={this.mode}
                 key="webview"
                 host={appSettings.get('host')}
                 params={params}
                 dispatch={dispatch}
                 timestamp={timestamp}
-                canGoBackward={appSettings.get('canGoBackward')}
-                canGoForward={appSettings.get('canGoForward')}
                 partition={`persist:${params.user}`}
-                url={url} />
+                url={url}
+                {...{ coll, user, rec }} />
           }
 
           {
             !__DESKTOP__ && (
               activeBrowser ?
                 <RemoteBrowser
+                  currMode={this.mode}
                   params={params}
                   rb={activeBrowser}
                   rec={rec}
@@ -103,6 +100,7 @@ class Live extends Component {
                   appPrefix={appPrefix}
                   auth={this.props.auth}
                   contentPrefix={contentPrefix}
+                  currMode={this.mode}
                   dispatch={dispatch}
                   params={params}
                   timestamp={timestamp}
@@ -110,7 +108,7 @@ class Live extends Component {
             )
           }
         </div>
-      </ControllerContext.Provider>
+      </React.Fragment>
     );
   }
 }

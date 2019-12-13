@@ -13,7 +13,6 @@ import { getArchives, setExtractable, updateUrlAndTimestamp } from 'store/module
 import { resetStats } from 'store/modules/infoStats';
 import { load as loadBrowsers, isLoaded as isRBLoaded, setBrowser } from 'store/modules/remoteBrowsers';
 import { getActiveCollection } from 'store/selectors';
-import { ControllerContext } from 'store/contexts';
 
 import { Autopilot, RemoteBrowser } from 'containers';
 import { IFrame, ReplayUI } from 'components/controls';
@@ -59,25 +58,20 @@ class Extract extends Component {
     } = this.props;
     const { user, coll, rec } = params;
 
-    const contextValues = {
-      canAdmin: auth.getIn(['user', 'username']) === user,
-      currMode: this.mode,
-      coll,
-      user,
-      rec
-    };
-
+    const canAdmin = auth.getIn(['user', 'username']) === user;
     const archId = extractable.get('id');
     const extractFrag = `${extractable.get('allSources') ? 'extract' : 'extract_only'}:${archId}`;
     const appPrefix = `${config.appHost}/${user}/${coll}/${rec}/${extractFrag}/`;
     const contentPrefix = `${config.contentHost}/${user}/${coll}/${rec}/${extractFrag}/`;
 
     return (
-      <ControllerContext.Provider value={contextValues}>
+      <React.Fragment>
         <ReplayUI
           activeBrowser={activeBrowser}
           activeCollection={activeCollection}
           autopilotRunning={autopilotRunning}
+          canAdmin={canAdmin}
+          currMode={this.mode}
           params={params}
           timestamp={timestamp}
           url={url} />
@@ -96,6 +90,7 @@ class Extract extends Component {
                 auth={this.props.auth}
                 behavior={this.props.behavior}
                 contentPrefix={contentPrefix}
+                currMode={this.mode}
                 dispatch={dispatch}
                 params={params}
                 timestamp={timestamp}
@@ -103,7 +98,7 @@ class Extract extends Component {
           }
           <Autopilot />
         </div>
-      </ControllerContext.Provider>
+      </React.Fragment>
     );
   }
 }

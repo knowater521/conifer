@@ -11,7 +11,6 @@ import { untitledEntry } from 'config';
 
 import { setBookmarkId, updateUrlAndTimestamp } from 'store/modules/controls';
 import { setBrowser } from 'store/modules/remoteBrowsers';
-import { ControllerContext } from 'store/contexts';
 
 import InlineEditor from 'components/InlineEditor';
 import { ListIcon } from 'components/icons';
@@ -21,11 +20,10 @@ import './style.scss';
 
 
 class SidebarListViewer extends Component {
-  static contextType = ControllerContext;
-
   static propTypes = {
     activeBookmark: PropTypes.number,
     bookmarks: PropTypes.object,
+    canAdmin: PropTypes.bool,
     clearInspector: PropTypes.func,
     collection: PropTypes.object,
     list: PropTypes.object,
@@ -148,7 +146,7 @@ class SidebarListViewer extends Component {
             <ListIcon />
             <InlineEditor
               blockDisplay
-              canAdmin={this.context.canAdmin}
+              canAdmin={this.props.canAdmin}
               initial={list.get('title')}
               onSave={this.editListTitle}
               success={listEdited}>

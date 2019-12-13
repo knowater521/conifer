@@ -4,7 +4,6 @@ import { Alert } from 'react-bootstrap';
 
 import WebSocketHandler from 'helpers/ws';
 import { getStorage } from 'helpers/utils';
-import { ControllerContext } from 'store/contexts';
 
 import { toggleAutopilot } from 'store/modules/automation';
 import { createRemoteBrowser } from 'store/modules/remoteBrowsers';
@@ -17,7 +16,6 @@ const CBrowser = !__DESKTOP__ && !__PLAYER__ && __CLIENT__ && require('shepherd-
 
 
 class RemoteBrowserUI extends Component {
-  static contextType = ControllerContext;
 
   static propTypes = {
     behavior: PropTypes.string,
@@ -230,8 +228,7 @@ class RemoteBrowserUI extends Component {
   connectToRemoteBrowser = (reqId, inactiveTime) => {
     /* Connect to the initialized remote browser session and open the websocket
     */
-    const { dispatch, params } = this.props;
-    const { currMode } = this.context;
+    const { currMode, dispatch, params } = this.props;
 
     this.pywbParams.inactiveSecs = inactiveTime;
 
@@ -246,8 +243,7 @@ class RemoteBrowserUI extends Component {
   }
 
   onExpire = () => {
-    const { currMode } = this.context;
-    const { params: { user, coll, rec }, rb, timestamp, url } = this.props;
+    const { currMode, params: { user, coll, rec }, rb, timestamp, url } = this.props;
     let message;
 
     if (!currMode.includes('replay')) {

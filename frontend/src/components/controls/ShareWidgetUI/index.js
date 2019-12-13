@@ -5,7 +5,7 @@ import Toggle from 'react-toggle';
 import { fromJS } from 'immutable';
 import { Link } from 'react-router-dom';
 
-import { AppContext, ControllerContext } from 'store/contexts';
+import { AppContext } from 'store/contexts';
 
 import OutsideClick from 'components/OutsideClick';
 import { ShareIcon } from 'components/icons';
@@ -15,8 +15,11 @@ import './style.scss';
 
 
 class ShareWidgetUI extends Component {
+  static contextType = AppContext;
+
   static propTypes = {
     bsSize: PropTypes.string,
+    canAdmin: PropTypes.bool,
     collection: PropTypes.object,
     embedUrl: PropTypes.string,
     isPublic: PropTypes.bool,
@@ -142,7 +145,8 @@ class ShareWidgetUI extends Component {
   }
 
   render() {
-    const { bsSize, collection, embedUrl, isPublic, shareUrl, showLoginModal } = this.props;
+    const { isAnon } = this.context;
+    const { bsSize, canAdmin, collection, embedUrl, isPublic, shareUrl, showLoginModal } = this.props;
     const { open, sizeSet, widgetHeight } = this.state;
 
     const shareClasses = classNames('share-container', { open });
@@ -150,76 +154,64 @@ class ShareWidgetUI extends Component {
     const shareableClasses = classNames('shareables', { disabled: !isPublic && sizeSet });
 
     return (
-      <AppContext.Consumer>
-        {
-          ({ isAnon }) => (
-            <ControllerContext.Consumer>
-              {
-                ({ canAdmin }) => (
-                  <OutsideClick handleClick={this.close}>
-                    <div id="share-widget" className={shareClasses} title="Sharing options">
-                      <div id="fb-root" />
-                      <button
-                        type="button"
-                        className={`btn btn-default btn-${bsSize} dropdown-toggle`}
-                        data-toggle="dropdown"
-                        aria-label="Sharing widget"
-                        onClick={this.toggle}>
-                        <ShareIcon />
-                        { bsSize === 'xs' && <span>&nbsp;Share</span> }
-                      </button>
-                      <div className="dropdown-menu share-modal arrow_box">
-                        <span onClick={this.close} role="button" className="glyphicon glyphicon-remove-circle" tabIndex={0} />
-                        {
-                          canAdmin &&
-                            <div className={widgetClasses}>
-                              {
-                                isAnon ?
-                                  <p className="make-public-desc">
-                                    This is a temporary collection. To preserve and share, <Link to="/_register">Sign Up</Link> or <button className="button-link" onClick={showLoginModal} type="button">Login</button>.
-                                  </p> :
-                                  <div>
-                                    <p className="make-public-desc">
-                                      Collection <strong>{ collection.get('title') }</strong> is set to private. To get a share link, make the collection public:
-                                    </p>
-                                    <div className="access-switch">
-                                      <span className="glyphicon glyphicon-globe" aria-hidden="true" />
-                                      <span className="left-buffer-sm hidden-xs">Collection Public?</span>
-                                      <Toggle
-                                        icons={false}
-                                        defaultChecked={isPublic}
-                                        onChange={this.setPublic} />
-                                    </div>
-                                  </div>
-                              }
-                            </div>
-                        }
-                        <div
-                          className={shareableClasses}
-                          ref={(obj) => { this.shareables = obj; }}
-                          style={widgetHeight !== 0 ? { height: widgetHeight } : {}}>
-                          <div className="platforms clearfix">
-                            <div id="wr-tw" ref={(obj) => { this.wrTW = obj; }} />
-                            <div id="wr-fb" ref={(obj) => { this.wrFB = obj; }}>
-                              <div className="fb-share-button" data-href={shareUrl} data-layout="button" data-size="large" data-mobile-iframe="true" />
-                            </div>
-                          </div>
-
-                          <label htmlFor="shareable-url">Copy and paste to share:</label>
-                          <input type="text" id="shareable-url" value={shareUrl} readOnly />
-
-                          <label htmlFor="shareable-embed-code">Embed code:</label>
-                          <textarea id="shareable-embed-code" readOnly value={`<iframe  src="${embedUrl}" onload="" width='640' height='480' seamless="seamless" frameborder="0" scrolling="yes" className="pager_iframe"></iframe>`} />
+      <OutsideClick handleClick={this.close}>
+        <div id="share-widget" className={shareClasses} title="Sharing options">
+          <div id="fb-root" />
+          <button
+            type="button"
+            className={`btn btn-default btn-${bsSize} dropdown-toggle`}
+            data-toggle="dropdown"
+            aria-label="Sharing widget"
+            onClick={this.toggle}>
+            <ShareIcon />
+            { bsSize === 'xs' && <span>&nbsp;Share</span> }
+          </button>
+          <div className="dropdown-menu share-modal arrow_box">
+            <span onClick={this.close} role="button" className="glyphicon glyphicon-remove-circle" tabIndex={0} />
+            {
+              canAdmin &&
+                <div className={widgetClasses}>
+                  {
+                    isAnon ?
+                      <p className="make-public-desc">
+                        This is a temporary collection. To preserve and share, <Link to="/_register">Sign Up</Link> or <button className="button-link" onClick={showLoginModal} type="button">Login</button>.
+                      </p> :
+                      <div>
+                        <p className="make-public-desc">
+                          Collection <strong>{ collection.get('title') }</strong> is set to private. To get a share link, make the collection public:
+                        </p>
+                        <div className="access-switch">
+                          <span className="glyphicon glyphicon-globe" aria-hidden="true" />
+                          <span className="left-buffer-sm hidden-xs">Collection Public?</span>
+                          <Toggle
+                            icons={false}
+                            defaultChecked={isPublic}
+                            onChange={this.setPublic} />
                         </div>
                       </div>
-                    </div>
-                  </OutsideClick>
-                )
-              }
-            </ControllerContext.Consumer>
-          )
-        }
-      </AppContext.Consumer>
+                  }
+                </div>
+            }
+            <div
+              className={shareableClasses}
+              ref={(obj) => { this.shareables = obj; }}
+              style={widgetHeight !== 0 ? { height: widgetHeight } : {}}>
+              <div className="platforms clearfix">
+                <div id="wr-tw" ref={(obj) => { this.wrTW = obj; }} />
+                <div id="wr-fb" ref={(obj) => { this.wrFB = obj; }}>
+                  <div className="fb-share-button" data-href={shareUrl} data-layout="button" data-size="large" data-mobile-iframe="true" />
+                </div>
+              </div>
+
+              <label htmlFor="shareable-url">Copy and paste to share:</label>
+              <input type="text" id="shareable-url" value={shareUrl} readOnly />
+
+              <label htmlFor="shareable-embed-code">Embed code:</label>
+              <textarea id="shareable-embed-code" readOnly value={`<iframe  src="${embedUrl}" onload="" width='640' height='480' seamless="seamless" frameborder="0" scrolling="yes" className="pager_iframe"></iframe>`} />
+            </div>
+          </div>
+        </div>
+      </OutsideClick>
     );
   }
 }

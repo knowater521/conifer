@@ -4,7 +4,6 @@ import { fromJS } from 'immutable';
 import { DropdownButton } from 'react-bootstrap';
 
 import { remoteBrowserMod } from 'helpers/utils';
-import { ControllerContext } from 'store/contexts';
 
 import { RemoteBrowserOption } from 'components/controls';
 
@@ -13,8 +12,6 @@ import 'shared/scss/dropdown.scss';
 import { filterBrowsers } from 'config';
 
 class RemoteBrowserSelectUI extends PureComponent {
-  static contextType = ControllerContext;
-
   static propTypes = {
     accessed: PropTypes.number,
     active: PropTypes.bool,
@@ -23,6 +20,7 @@ class RemoteBrowserSelectUI extends PureComponent {
     activeList: PropTypes.string,
     autopilotRunning: PropTypes.bool,
     browsers: PropTypes.object,
+    currMode: PropTypes.bool,
     getBrowsers: PropTypes.func,
     history: PropTypes.object,
     loading: PropTypes.bool,
@@ -55,10 +53,9 @@ class RemoteBrowserSelectUI extends PureComponent {
   }
 
   selectBrowser = (id) => {
-    const { active, activeBookmarkId, activeList, history, params, timestamp, url } = this.props;
-    const { currMode } = this.context;
+    const { active, activeBookmarkId, activeList, currMode, history, params, timestamp, url } = this.props;
 
-    this.setState({ open: false});
+    this.setState({ open: false });
 
     if (active) {
       const { archiveId, coll, collId, extractMode, rec, user } = params;

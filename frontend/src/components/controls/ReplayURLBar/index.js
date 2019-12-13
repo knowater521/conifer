@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { remoteBrowserMod } from 'helpers/utils';
-import { ControllerContext } from 'store/contexts';
 
 import { InfoWidget, RemoteBrowserSelect } from 'containers';
 
@@ -12,10 +11,9 @@ import './style.scss';
 
 
 class ReplayURLBar extends Component {
-  static contextType = ControllerContext;
-
   static propTypes = {
     activeBrowser: PropTypes.string,
+    canAdmin: PropTypes.bool,
     bookmarks: PropTypes.object,
     history: PropTypes.object,
     params: PropTypes.object,
@@ -52,8 +50,7 @@ class ReplayURLBar extends Component {
   }
 
   render() {
-    const { canAdmin } = this.context;
-    const { params, timestamp } = this.props;
+    const { canAdmin, params, timestamp } = this.props;
     const { url } = this.state;
 
     return (
@@ -65,6 +62,7 @@ class ReplayURLBar extends Component {
                 <div className="input-group-btn rb-dropdown">
                   <RemoteBrowserSelect
                     active
+                    currMode={this.props.currMode}
                     params={params} />
                 </div>
             }

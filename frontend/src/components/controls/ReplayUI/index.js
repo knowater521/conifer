@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { withRouter } from 'react-router';
 
-import { AppContext, ControllerContext } from 'store/contexts';
+import { AppContext } from 'store/contexts';
 
 import { ModeSelector, RecordingTools } from 'containers';
 
@@ -15,11 +15,15 @@ import './style.scss';
 
 
 class ReplayUI extends Component {
+  static contextType = AppContext;
+
   static propTypes = {
     activeBrowser: PropTypes.string,
     autopilotRunning: PropTypes.bool,
+    canAdmin: PropTypes.bool,
     canGoBackward: PropTypes.bool,
     canGoForward: PropTypes.bool,
+    currMode: PropTypes.string,
     params: PropTypes.object,
     sidebarExpanded: PropTypes.bool,
     timestamp: PropTypes.string,
@@ -52,7 +56,8 @@ class ReplayUI extends Component {
   }
 
   render() {
-    const { canGoBackward, canGoForward } = this.props;
+    const { isMobile } = this.context;
+    const { canAdmin, currMode, canGoBackward, canGoForward } = this.props;
     const writeModes = ['extract', 'extract_only', 'patch', 'record', 'live'];
 
     let backClass;
@@ -72,57 +77,47 @@ class ReplayUI extends Component {
     }
 
     return (
-      <AppContext.Consumer>
+      <div role="presentation" className={classNames('container-fluid wr-controls navbar-default', { 'has-widget': ['extract', 'extract_only', 'patch'].includes(currMode) })}>
         {
-          ({ isMobile }) => (
-            <ControllerContext.Consumer>
-              {
-                ({ canAdmin, currMode }) => (
-                  <div role="presentation" className={classNames('container-fluid wr-controls navbar-default', { 'has-widget': ['extract', 'extract_only', 'patch'].includes(currMode) })}>
-                    {
-                      currMode.includes('replay') && !isMobile &&
-                        <Button className="sidebar-toggle" onClick={this.toggleSidebar}>
-                          <InfoIcon />
-                        </Button>
-                    }
-
-                    {
-                      canAdmin && !isMobile &&
-                        <ModeSelector />
-                    }
-
-                    {
-                      __DESKTOP__ &&
-                        <div className="browser-nav">
-                          <button onClick={this.triggerBack} disabled={!canGoBackward} className={backClass} title="Click to go back" aria-label="navigate back" type="button">
-                            <PlayerArrowLeftIcon />
-                          </button>
-                          <button onClick={this.triggerForward} disabled={!canGoForward} className={fwdClass} title="Click to go forward" aria-label="navigate forward" type="button">
-                            <PlayerArrowRightIcon />
-                          </button>
-                          <button onClick={this.triggerRefresh} disabled={false} className={refreshClass} title="Refresh inner window" aria-label="Refresh inner window" type="button">
-                            <RefreshIcon />
-                          </button>
-                        </div>
-                    }
-
-                    {
-                      writeModes.includes(currMode) ?
-                        <RecordURLBar {...this.props} /> :
-                        <ReplayURLBar {...this.props} />
-                    }
-
-                    {
-                      !isMobile && !__PLAYER__ &&
-                        <RecordingTools />
-                    }
-                  </div>
-                )
-              }
-            </ControllerContext.Consumer>
-          )
+          currMode.includes('replay') && !isMobile &&
+            <Button className="sidebar-toggle" onClick={this.toggleSidebar}>
+              <InfoIcon />
+            </Button>
         }
-      </AppContext.Consumer>
+
+        {
+          canAdmin && !isMobile &&
+            <ModeSelector currMode={this.props.currMode} />
+        }
+
+        {
+          __DESKTOP__ &&
+            <div className="browser-nav">
+              <button onClick={this.triggerBack} disabled={!canGoBackward} className={backClass} title="Click to go back" aria-label="navigate back" type="button">
+                <PlayerArrowLeftIcon />
+              </button>
+              <button onClick={this.triggerForward} disabled={!canGoForward} className={fwdClass} title="Click to go forward" aria-label="navigate forward" type="button">
+                <PlayerArrowRightIcon />
+              </button>
+              <button onClick={this.triggerRefresh} disabled={false} className={refreshClass} title="Refresh inner window" aria-label="Refresh inner window" type="button">
+                <RefreshIcon />
+              </button>
+            </div>
+        }
+
+        {
+          writeModes.includes(currMode) ?
+            <RecordURLBar {...this.props} /> :
+            <ReplayURLBar {...this.props} />
+        }
+
+        {
+          !isMobile && !__PLAYER__ &&
+            <RecordingTools
+              canAdmin={this.props.canAdmin}
+              currMode={this.props.currMode} />
+        }
+      </div>
     );
   }
 }
